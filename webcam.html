@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <!-- Carga TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.10.0"> </script>
+    <script src="webcam.js"> </script>
+  </head>
+  
+  <body>
+  <div id="container">
+    <video autoplay playsinline muted id="videoElement" width="320" height="320"></video>
+    <button onclick="capture()">Capturar</button>
+  </div>
+
+  <canvas id="viewport" width="32" height="32" style="border: 1px solid red;"></canvas>
+
+
+  <script>
+  var video = document.getElementById("videoElement");
+
+  const webcam = new Webcam(video);
+  webcam.setup();
+  
+  let model = null;
+  
+  tf.loadModel('https://tcc.nyc3.digitaloceanspaces.com/smile/model.json').then(function(value) {
+    model = value
+    console.log("loaded")
+  });
+
+  function capture() {
+    const img = webcam.capture();
+    const imgData = img.dataSync()
+    console.log(model.predict(img).dataSync());
+
+    var canvas = document.getElementById("viewport"); 
+    var context = canvas.getContext("2d");
+    
+    var width = canvas.width;
+    var height = canvas.height;
+
+    var imagedata = context.createImageData(width, height);
+
+    for (let xImg=0, xCanvas=0; xImg<imgData.length; xImg+=1, xCanvas+=4) {
+      imagedata.data[xCanvas] = imgData[xImg]*255;
+      imagedata.data[xCanvas+1] = imgData[xImg]*255;
+      imagedata.data[xCanvas+2] = imgData[xImg]*255;
+      imagedata.data[xCanvas+3] = 255;
+    }
+
+    context.putImageData(imagedata, 0, 0);
+  }
+ 
+
+  window.setInterval(capture, 500);
+    </script>
+  </body>
+</html>

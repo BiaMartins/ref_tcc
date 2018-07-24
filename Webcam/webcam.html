@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <!-- Carga TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.10.0"> </script>
+    <script src="webcam.js"> </script>
+  </head>
+  
+  <body>
+  <div id="container">
+    <video autoplay playsinline muted id="videoElement" width="320" height="320"></video>
+    <button onclick="capture()">Capturar</button>
+    <canvas style="border: 1px solid red;" id = "tutorial" width="320" height="320"></canvas>
+  </div>
+
+  <script>
+  var video = document.getElementById("videoElement");
+
+  const webcam = new Webcam(video);
+  webcam.setup();
+  
+  let model = null;
+  
+  tf.loadModel('https://smile.nyc3.digitaloceanspaces.com/model.json').then(function(value) {
+    model = value
+    console.log("loaded")
+  });
+
+  function capture() {
+    const img = webcam.capture();
+    console.log(model.predict(img).dataSync());
+    
+
+  }
+
+  //window.setInterval(capture,500);
+ 
+    </script>
+  </body>
+</html>
